@@ -17,18 +17,15 @@ jobs:
           ref: ${{ github.event.inputs.tag }}
           fetch-depth: 0
 
-      - name: Download SonarScanner CLI
-        run: |
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-          unzip sonar-scanner-cli-5.0.1.3006-linux.zip
-
-      - name: Run SonarScanner directly
-        run: |
-          ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
-            -Dsonar.projectKey=MUTASIMU_maven-${{ github.event.inputs.tag }} \
-            -Dsonar.organization=mutasimu \
-            -Dsonar.sources=. \
-            -Dsonar.java.binaries=. \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.projectKey=MUTASIMU_maven-${{ github.event.inputs.tag }}
+            -Dsonar.organization=mutasimu
+            -Dsonar.sources=.
+            -Dsonar.java.binaries=.
             -Dsonar.exclusions=**/src/test/**,**/target/**
