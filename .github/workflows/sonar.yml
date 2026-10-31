@@ -17,13 +17,21 @@ jobs:
           ref: ${{ github.event.inputs.tag }}
           fetch-depth: 0
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+      - name: Set up JDK 11 for Build
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean compile -DskipTests
+
+      - name: Set up JDK 17 for Sonar Scan
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Build and Analyze
         run: |
-          mvn clean compile -DskipTests
           mvn sonar:sonar -Dsonar.projectKey=MUTASIMU_maven-${{ github.event.inputs.tag }} -Dsonar.organization=mutasimu -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.exclusions=**/src/test/**,**/target/**
